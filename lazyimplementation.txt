@@ -1,0 +1,140 @@
+nestedArr = [node, weight]
+let graph = {
+  0: [[1,4], [2,1]],
+  1 :[[3,1]],
+  2: [[1,2],[3,5]],
+  3: [[4,3]],
+  4: []
+}
+
+[0, i, i, i, i]
+
+function findShortestPath(s,e,graph){
+  let dist = {}
+  for(let node in graph){
+    dist[node] = Infinity
+  }
+  dist[s] = 0
+  findShortestPathHelper(s,dist,graph)
+  return dist[e]
+}
+
+function findShortestPathHelper(s,dist,graph){
+  let visited = {}
+  let priorityQueue = new Priority();
+  priorityQueue.add(s,0)
+  while(priorityQueue.length() > 0){
+    let nodeArr = priorityQueue.pop()
+    let node = nodeArr[0]
+    let nodeWeight = nodeArr[1]
+    if(visited[node]) continue
+    visited[node] = true
+    if(nodeWeight > dist[node]) continue
+    for(let toNodeArr of graph[node]){
+      let toNode = toNodeArr[0]
+      let totalWeight = toNodeArr[1] + nodeWeight
+      if(totalWeight < dist[toNode]){
+        dist[toNode] = totalWeight
+        priorityQueue.add(toNode,totalWeight)
+      }
+    }
+  }
+}
+
+
+
+
+class Priority {
+  constructor(){
+    this.array = []
+  }
+
+  add(node,value){
+    this.array.push([node,value])
+    this.sortArr();
+  }
+
+  sortArr(){
+    this.array.sort((a,b) => b[1] - a[1])
+  }
+
+  pop(){
+    let removedItem = this.array.pop()
+    this.sortArr()
+    return removedItem
+  }
+
+  length(){
+    return this.array.length
+  }
+
+}
+
+
+
+Don't need a minHeap
+
+class Priority {
+  constructor(){
+    this.array = []
+  }
+  
+  add(node,value){
+    let obj = {node: node, weight: value}
+    this.array.push(obj)
+    this.siftUp(this.array.length - 1, array)
+  }
+  
+  siftDown(idx,length, array){
+    let childOneIdx = idx * 2 + 1 
+    while(childOneIdx <= length){
+      let childTwoIdx = idx * 2 + 2 <= length ? idx * 2 + 2 : -1 
+      let minChild;
+      if(childTwoIdx != -1 && array[childTwoIdx].value < array[childOneIdx].value){
+        minChild = childTwoIdx
+      }else {
+        minChild = childOneIdx
+      }
+      
+      if(array[minChild].value < array[idx].value){
+        swap(minChild,idx,array)
+        idx = minChild
+        childOneIdx = idx * 2 + 1
+      }else {
+        break
+      }
+    }
+  }
+  
+  siftUp(idx, array){
+    let parentIdx = Math.floor((idx - 1) / 2)
+    while(parentIdx >= 0){
+      let parentIdxObj = array[parentIdx]
+      let currObj = array[idx]
+      if(currObj.weight < parentIdx.weight){
+        this.swap(parentIdx,idx)
+        idx = parentIdx
+        parentIdx = Math.floor((idx - 1) / 2)
+      }else {
+        break;
+      }
+    }
+  }
+  
+  pop(){
+    swap(0,this.array.length - 1, this.array)
+    let removedObj = this.array.pop()
+    this.siftDown(0,this.array.length,this.array)
+    return [removedObj.node,removedObj.value]
+  } //returns nested arr [node,value]
+  
+  length(){
+    return this.array.length
+  }
+  
+  swap(i,j,array){
+    let temp = array[i]
+    array[i] = array[j]
+    array[j] = temp
+  }
+}
