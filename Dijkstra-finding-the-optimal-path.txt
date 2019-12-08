@@ -1,0 +1,87 @@
+const graph = {
+  "A": [["B",3], ["C", 6]],
+  "B": [["E",11], ["D",4], ["C",4]],
+  "C": [["D",8],["G", 11]],
+  E: [["H", 9]],
+  D: [["E",10], ["F",5], ["G",2]],
+  F: [["H",1]],
+  G: [["H",2]],
+  H: []
+}
+
+function findShortestPath(s,e,graph){
+  let minPath = {}
+  let minNode = {}
+  for(let node in graph){
+    minPath[node] = Infinity
+  }
+  minPath[s] = 0
+  setMinPathToAllNodes(s,minPath,graph,minNode) // Uses BFS
+  let result = createPathToStartNode(minNode,s,e) // Returns array
+  return result.join("->")
+}
+
+
+function createPathToStartNode(minNodes,s,e){
+  let result = []
+  let node = e
+  while(minNodes[node]){
+    result.unshift(node)
+    node = minNodes[node]
+  }
+  result.unshift(node)
+  return result
+}
+
+function setMinPathToAllNodes(s,minPath,graph,minNode){
+  let visited = {}
+  let PQ = new Priority()
+  PQ.add(s,0)
+  while(PQ.length() > 0){
+    let nodeArr = PQ.shift()
+    let node = nodeArr[0]
+    let weight = nodeArr[1]
+    if(visited[node]) continue
+    visited[node] = true
+    if(minPath[node] < weight) continue
+    for(let toNodeArr of graph[node]){
+      let toNode = toNodeArr[0]
+      if(visited[toNode]) continue
+      let totalWeight = toNodeArr[1] + weight
+      if(totalWeight < minPath[toNode]){
+        minPath[toNode] = totalWeight
+        PQ.add(toNode,totalWeight)
+        minNode[toNode] = node
+      }
+    }
+  
+  }
+  
+}
+
+
+
+class Priority {
+  constructor(){
+    this.array = []
+  }
+  
+  length(){
+    return this.array.length 
+  }
+  
+  add(node,value){
+    this.array.push([node,value])
+    this.sortArr()
+  }
+  
+  shift(){
+    let removedArr = this.array.shift()
+    this.sortArr()
+    return removedArr
+  } // returns nested arr
+  
+  sortArr(){
+    this.array.sort((a,b) => a[1] - b[1])
+  }
+}
